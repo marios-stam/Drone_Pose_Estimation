@@ -47,6 +47,7 @@ def calibrate(dirpath, prefix, image_format, square_size, width=9, height=6):
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 
     return [ret, mtx, dist, rvecs, tvecs]
+
 def save_coefficients(mtx, dist, path):
     """ Save the camera matrix and the distortion coefficients to given path/file. """
     cv_file = cv2.FileStorage(path, cv2.FILE_STORAGE_WRITE)
@@ -54,6 +55,7 @@ def save_coefficients(mtx, dist, path):
     cv_file.write("D", dist)
     # note you *release* you don't close() a FileStorage object
     cv_file.release()
+
 def load_coefficients(path):
     """ Loads camera matrix and distortion coefficients. """
     # FILE_STORAGE_READ
@@ -77,11 +79,16 @@ def getCalibrationPhotos(numOfPhotos=5):
     success, image = cap.read()
     count = 0
     while success and count<numOfPhotos:
-        time.sleep(0.5)
-        cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
+        cv2.imshow("Calibration photo",image)
+        cv2.waitKey(0)#wait key to get next photo
+        # time.sleep(0.5)
+        cv2.imwrite("calibrationPhotos/frame%d.jpg" % count, image)     # save frame as JPEG file      
         success,image = cap.read()
         print('Read a new frame: ', success)
         count += 1
 
 if __name__=="__main__":
-    getCalibrationPhotos()
+    # getCalibrationPhotos()
+    # calibrate('calibrationPhotos','frame','.jpg',square_size=)
+    # save_coefficients("cameraCoeffs.yml")
+    # load_coefficients("cameraCoeffs.yml")
