@@ -92,3 +92,4 @@ if __name__=="__main__":
     # calibrate('calibrationPhotos','frame','.jpg',square_size=)
     # save_coefficients("cameraCoeffs.yml")
     # load_coefficients("cameraCoeffs.yml")
+    pass
