@@ -26,11 +26,11 @@ def calibrate(dirpath, prefix, image_format, square_size, width=9, height=6):
         dirpath = dirpath[:-1]
 
     images = glob.glob(dirpath+'/' + prefix + '*.' + image_format)
-
+    print(images)
     for fname in images:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
+        print(fname)
         # Find the chess board corners
         ret, corners = cv2.findChessboardCorners(gray, (width, height), None)
 
@@ -69,7 +69,7 @@ def load_coefficients(path):
     cv_file.release()
     return [camera_matrix, dist_matrix]
 
-def getCalibrationPhotos(numOfPhotos=5):
+def getCalibrationPhotos(numOfPhotos=25):
     CAMERA_INDEX=0
     # For webcam input:
     cap = cv2.VideoCapture(0)
@@ -88,8 +88,8 @@ def getCalibrationPhotos(numOfPhotos=5):
         count += 1
 
 if __name__=="__main__":
-    # getCalibrationPhotos()
-    # calibrate('calibrationPhotos','frame','.jpg',square_size=)
-    # save_coefficients("cameraCoeffs.yml")
-    # load_coefficients("cameraCoeffs.yml")
+    #getCalibrationPhotos()
+    # ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=8/100)
+    # save_coefficients(mtx,dist,"cameraCoeffs.yml")
+    camera_matrix, dist_matrix=load_coefficients("cameraCoeffs.yml")
     pass
