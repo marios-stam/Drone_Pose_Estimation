@@ -5,6 +5,7 @@ import glob
 import argparse
 from imutils.video import VideoStream
 import time
+import os
 
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -44,7 +45,9 @@ def calibrate(dirpath, prefix, image_format, square_size, width=9, height=6):
             # Draw and display the corners
             img = cv2.drawChessboardCorners(img, (width, height), corners2, ret)
 
-    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+    img = cv2.imread(images[0])
+    sample = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, sample.shape[::-1], None, None)
 
     return [ret, mtx, dist, rvecs, tvecs]
 
@@ -70,6 +73,9 @@ def load_coefficients(path):
     return [camera_matrix, dist_matrix]
 
 def getCalibrationPhotos(numOfPhotos=25):
+    if not os.path.isdir( 'calibrationPhotos' ) :
+        os.mkdir( 'calibrationPhotos' )  # make sure the directory exists
+
     CAMERA_INDEX=0
     # For webcam input:
     cap = cv2.VideoCapture(0)
@@ -88,8 +94,15 @@ def getCalibrationPhotos(numOfPhotos=25):
         count += 1
 
 if __name__=="__main__":
-    #getCalibrationPhotos()
-    # ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=8/100)
-    # save_coefficients(mtx,dist,"cameraCoeffs.yml")
-    camera_matrix, dist_matrix=load_coefficients("cameraCoeffs.yml")
+    save_new=input("Do you want to save new camera coefficients? [y/n]")
+    if( save_new.lower() == "y" ):
+        
+        take_new_photos=input("Do you want to take new calibration photos? [y/n]")
+        if( take_new_photos.lower() == "y" ):
+            getCalibrationPhotos()
+        
+        ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=8/100)
+        save_coefficients(mtx,dist,"cameraCoeffs.yml")
+    else:
+        camera_matrix, dist_matrix=load_coefficients("cameraCoeffs.yml")
     pass
