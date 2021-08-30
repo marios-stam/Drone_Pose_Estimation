@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import cv2.aruco as aruco
-import calibration
+from calibration import calibration
 import glob
 from matplotlib import pyplot as plt
 
@@ -157,7 +157,7 @@ def pose_estimation_simple(frame, matrix_coefficients, distortion_coefficients):
     return frame,tvec
 
 if __name__=="__main__":
-    camera_matrix, dist_matrix=calibration.load_coefficients("cameraCoeffs.yml")
+    camera_matrix, dist_matrix=calibration.load_coefficients("calibration/cameraCoeffs.yml")
     if(LIVE_VIDEO_MODE):
         track_live_video(camera_matrix,dist_matrix)
     else:

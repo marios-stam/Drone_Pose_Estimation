@@ -6,8 +6,23 @@ import argparse
 from imutils.video import VideoStream
 import time
 import os
+import sys
 
-from utilities import getVideoCap
+# getting the name of the directory
+# where the this file is present.
+current = os.path.dirname(os.path.realpath(__file__))
+  
+# Getting the parent directory name
+# where the current directory is present.
+parent = os.path.dirname(current)
+  
+# adding the parent directory to 
+# the sys.path.
+sys.path.append(parent)
+  
+# now we can import the module in the parent
+# directory.
+from  utilities import getVideoCap
 
 USE_USB_CAMERA=True
 SQUARE_SIZE=2.5 #cm
@@ -77,8 +92,8 @@ def load_coefficients(path):
     return [camera_matrix, dist_matrix]
 
 def getCalibrationPhotos(numOfPhotos=25):
-    if not os.path.isdir( 'calibrationPhotos' ) :
-        os.mkdir( 'calibrationPhotos' )  # make sure the directory exists
+    if not os.path.isdir( 'calibration/calibrationPhotos' ) :
+        os.mkdir( 'calibration/calibrationPhotos' )  # make sure the directory exists
 
     CAMERA_INDEX=0
     # For webcam input:
@@ -92,7 +107,7 @@ def getCalibrationPhotos(numOfPhotos=25):
         cv2.imshow("Calibration photo",image)
         #cv2.waitKey(0)#wait key to get next photo
         time.sleep(1)
-        cv2.imwrite("calibrationPhotos/frame%d.jpg" % count, image)     # save frame as JPEG file      
+        cv2.imwrite("calibration//calibrationPhotosframe%d.jpg" % count, image)     # save frame as JPEG file      
         success,image = cap.read()
         print('Read a new frame: ', success)
         count += 1
@@ -106,8 +121,8 @@ if __name__=="__main__":
         if( take_new_photos.lower() == "y" ):
             getCalibrationPhotos()
         
-        ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=SQUARE_SIZE)
-        save_coefficients(mtx,dist,"cameraCoeffs.yml")
+        ret, mtx, dist, rvecs, tvecs=calibrate('calibration/calibrationPhotos','frame','jpg',square_size=SQUARE_SIZE)
+        save_coefficients(mtx,dist,"calibration/cameraCoeffs.yml")
     else:
-        camera_matrix, dist_matrix=load_coefficients("cameraCoeffs.yml")
+        camera_matrix, dist_matrix=load_coefficients("calibration/cameraCoeffs.yml")
     pass
