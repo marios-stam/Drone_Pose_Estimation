@@ -6,7 +6,8 @@ import glob
 from matplotlib import pyplot as plt
 
 from utilities import getVideoCap
-from graphs import setup_xyz_graph,update_xyz_graph
+#from graphs import setup_xyz_graph,update_xyz_graph
+from graphs import xyz_graph
 
 MARKER_LENGTH=7.5
 #CAMERA_INDEX=0 #for internal camera
@@ -20,7 +21,7 @@ SIMPLE_POSE_ALGORITHM=True
 
 def track_live_video(matrix_coefficients, distortion_coefficients):
     cap = getVideoCap(usb=USB_CAMERA)
-    fig,ax_x,ax_y,ax_z=setup_xyz_graph()
+    xyz_gr=xyz_graph()
     
     while True:
         ret, frame = cap.read()
@@ -34,8 +35,8 @@ def track_live_video(matrix_coefficients, distortion_coefficients):
         
         if len(tvec)>0:
             text="%.1f,%.1f,%.1f"%( tvec[0][0][0],tvec[0][0][1],tvec[0][0][2] )
-            frame = writeTextToFrame(frame, text) 
-            update_xyz_graph(ax_x,ax_y,ax_z,tvec)
+            frame = writeTextToFrame(frame, text)
+            xyz_gr.update(tvec)
 
         cv2.imshow('frame', frame)
         key = cv2.waitKey(3) & 0xFF
