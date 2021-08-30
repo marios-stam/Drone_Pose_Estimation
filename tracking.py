@@ -5,17 +5,23 @@ import calibration
 import glob
 from matplotlib import pyplot as plt
 
+from utilities import getVideoCap
+from graphs import setup_xyz_graph,update_xyz_graph
+
 MARKER_LENGTH=7.5
 #CAMERA_INDEX=0 #for internal camera
 CAMERA_INDEX=2 #for USB web-cam
 
 LIVE_VIDEO_MODE=True
+USB_CAMERA=True
+
 SIMPLE_POSE_ALGORITHM=True
 
 
 def track_live_video(matrix_coefficients, distortion_coefficients):
-    cap = cv2.VideoCapture(CAMERA_INDEX)
-    cap.set(cv2.CAP_PROP_FPS, 30)
+    cap = getVideoCap(usb=USB_CAMERA)
+    fig,ax_x,ax_y,ax_z=setup_xyz_graph()
+    
     while True:
         ret, frame = cap.read()
         # operations on the frame come here
@@ -29,7 +35,8 @@ def track_live_video(matrix_coefficients, distortion_coefficients):
         if len(tvec)>0:
             text="%.1f,%.1f,%.1f"%( tvec[0][0][0],tvec[0][0][1],tvec[0][0][2] )
             frame = writeTextToFrame(frame, text) 
-        
+            update_xyz_graph(ax_x,ax_y,ax_z,tvec)
+
         cv2.imshow('frame', frame)
         key = cv2.waitKey(3) & 0xFF
         if key == ord('q'):  # Quit

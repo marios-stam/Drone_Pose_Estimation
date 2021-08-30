@@ -7,6 +7,10 @@ from imutils.video import VideoStream
 import time
 import os
 
+from utilities import getVideoCap
+
+USE_USB_CAMERA=True
+SQUARE_SIZE=2.5 #cm
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -78,7 +82,7 @@ def getCalibrationPhotos(numOfPhotos=25):
 
     CAMERA_INDEX=0
     # For webcam input:
-    cap = cv2.VideoCapture(0)
+    cap = getVideoCap(usb=USE_USB_CAMERA)
 
     time.sleep(2.0)
     
@@ -86,12 +90,13 @@ def getCalibrationPhotos(numOfPhotos=25):
     count = 0
     while success and count<numOfPhotos:
         cv2.imshow("Calibration photo",image)
-        cv2.waitKey(0)#wait key to get next photo
-        # time.sleep(0.5)
+        #cv2.waitKey(0)#wait key to get next photo
+        time.sleep(1)
         cv2.imwrite("calibrationPhotos/frame%d.jpg" % count, image)     # save frame as JPEG file      
         success,image = cap.read()
         print('Read a new frame: ', success)
         count += 1
+
 
 if __name__=="__main__":
     save_new=input("Do you want to save new camera coefficients? [y/n]")
@@ -101,7 +106,7 @@ if __name__=="__main__":
         if( take_new_photos.lower() == "y" ):
             getCalibrationPhotos()
         
-        ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=8/100)
+        ret, mtx, dist, rvecs, tvecs=calibrate('calibrationPhotos','frame','jpg',square_size=SQUARE_SIZE)
         save_coefficients(mtx,dist,"cameraCoeffs.yml")
     else:
         camera_matrix, dist_matrix=load_coefficients("cameraCoeffs.yml")
