@@ -25,7 +25,7 @@ sys.path.append(parent)
 from  utilities import getVideoCap
 
 USE_USB_CAMERA=True
-SQUARE_SIZE=2.5 #cm
+SQUARE_SIZE=2.4 #cm
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -107,7 +107,7 @@ def getCalibrationPhotos(numOfPhotos=25):
         cv2.imshow("Calibration photo",image)
         #cv2.waitKey(0)#wait key to get next photo
         time.sleep(1)
-        cv2.imwrite("calibration//calibrationPhotosframe%d.jpg" % count, image)     # save frame as JPEG file      
+        cv2.imwrite("calibration/calibrationPhotos/frame%d.jpg" % count, image)     # save frame as JPEG file      
         success,image = cap.read()
         print('Read a new frame: ', success)
         count += 1

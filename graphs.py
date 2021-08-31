@@ -22,9 +22,13 @@ class xyz_graph:
         self.ax_y.title.set_text('Y')
         self.ax_z.title.set_text('Z')
 
-        self.ax_x.set_ylim([-45, 45 ])
-        self.ax_y.set_ylim([-15, 50 ])
-        self.ax_z.set_ylim([ 0 , 120])
+        self.ax_x.set_ylim([-50, 50 ])
+        self.ax_y.set_ylim([-50, 50 ])
+        self.ax_z.set_ylim([ 0 , 400])
+
+        # self.ax_x.set_ylim([0, 800 ])
+        # self.ax_y.set_ylim([0, 800 ])
+        # self.ax_z.set_ylim([0, 800])
     
     def update(self,tvec):
       
