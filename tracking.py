@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from utilities import getVideoCap
 #from graphs import setup_xyz_graph,update_xyz_graph
 from graphs import xyz_graph
+from math_operations import rotationMatrixToEulerAngles
 
 MARKER_LENGTH=7.9
 #CAMERA_INDEX=0 #for internal camera
@@ -20,7 +21,7 @@ USB_CAMERA=True
 
 SIMPLE_POSE_ALGORITHM=True
 
-XYZ_GRAPH=1
+XYZ_GRAPH=0
 
 def track_live_video(matrix_coefficients, distortion_coefficients):
     cap = getVideoCap(usb=USB_CAMERA)
@@ -30,14 +31,15 @@ def track_live_video(matrix_coefficients, distortion_coefficients):
         ret, frame = cap.read()
         # operations on the frame come here
         if SIMPLE_POSE_ALGORITHM:
-            frame,tvec = pose_estimation_simple(frame, matrix_coefficients, distortion_coefficients)
+            frame,tvec,rpy = pose_estimation_simple(frame, matrix_coefficients, distortion_coefficients)
         else:
-            frame,tvec = pose_estimation(frame, matrix_coefficients, distortion_coefficients)
+            frame,tvec= pose_estimation(frame, matrix_coefficients, distortion_coefficients)
         
         frame=cv2.flip(frame, 1) #flip frame to make it easier for user to test it live
         
         if len(tvec)>0:
-            text="%.1f,%.1f,%.1f"%( tvec[0][0][0],tvec[0][0][1],tvec[0][0][2] )
+            #text="%.1f,%.1f,%.1f"%( tvec[0][0][0],tvec[0][0][1],tvec[0][0][2] )
+            text="%.1f,%.1f,%.1f"%( rpy[0],rpy[1],rpy[2] )
             frame = writeTextToFrame(frame, text)
             if XYZ_GRAPH:
                 xyz_gr.update(tvec)
@@ -154,7 +156,7 @@ def pose_estimation_simple(frame, matrix_coefficients, distortion_coefficients):
                                                             cameraMatrix=matrix_coefficients,
                                                             distCoeff=distortion_coefficients)
     
-    tvec=[]
+    tvec,rpy=[],[]
     if np.all(ids is not None):  # If there are markers found by detector
         for i in range(0, len(ids)):  # Iterate in markers
             # Estimate pose of each marker and return the values rvec and tvec---different from camera coefficients
@@ -163,11 +165,10 @@ def pose_estimation_simple(frame, matrix_coefficients, distortion_coefficients):
             #(rvec - tvec).any()  # get rid of that nasty numpy value array error
             aruco.drawDetectedMarkers(frame, corners)  # Draw A square around the markers
 
-            # x = (corners[0][0][0][0] + corners[0][0][1][0] + corners[0][0][2][0] + corners[0][0][3][0]) / 4
-            # y = (corners[0][0][0][1] + corners[0][0][1][1] + corners[0][0][2][1] + corners[0][0][3][1]) / 4
-            # tvec=[[[x,y,tvec[0][0][2]]]]
-
-    return frame,tvec
+            R=cv2.Rodrigues(rvec)[0]
+            rpy=rotationMatrixToEulerAngles(R)
+            
+    return frame,tvec,rpy
 
 if __name__=="__main__":
     camera_matrix, dist_matrix=calibration.load_coefficients("calibration/cameraCoeffs.yml")
