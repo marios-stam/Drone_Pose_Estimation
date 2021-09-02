@@ -14,7 +14,7 @@ def isRotationMatrix(R) :
 # The result is the same as MATLAB except the order
 # of the euler angles ( x and z are swapped ).
 def rotationMatrixToEulerAngles(R) :
-    print(R)
+    #print(R)
     assert(isRotationMatrix(R))
 
     sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])

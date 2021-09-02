@@ -11,13 +11,10 @@ from graphs import xyz_graph
 from math_operations import rotationMatrixToEulerAngles
 
 MARKER_LENGTH=7.9
-#CAMERA_INDEX=0 #for internal camera
-CAMERA_INDEX=2 #for USB web-cam
 
 LIVE_VIDEO_MODE=1
 
-
-USB_CAMERA=True
+USB_CAMERA=0
 
 SIMPLE_POSE_ALGORITHM=True
 
