@@ -89,7 +89,7 @@ def load_coefficients(path):
     dist_matrix = cv_file.getNode("D").mat()
 
     cv_file.release()
-    return [camera_matrix, dist_matrix]
+    return camera_matrix, dist_matrix
 
 def getCalibrationPhotos(numOfPhotos=25):
     if not os.path.isdir( 'calibration/calibrationPhotos' ) :

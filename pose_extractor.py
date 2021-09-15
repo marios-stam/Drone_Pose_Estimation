@@ -1,14 +1,17 @@
 from numpy.lib.function_base import extract
-from utilities import getVideoCap
-from tracking import pose_estimation_simple
-from calibration import calibration
+from .utilities import getVideoCap
+from .tracking import pose_estimation_simple
+from .calibration import calibration
 import cv2
+import os
 
 class pose_extractor:
     def __init__(self,USB_cam=1):
         self.cap = getVideoCap(usb=USB_cam)
-        self.matrix_coefficients,self.distortion_coefficients=calibration.load_coefficients("calibration/cameraCoeffs.yml")
-
+        params=calibration.load_coefficients("catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/calibration/cameraCoeffs.yml")
+        print(params)
+        self.matrix_coefficients,self.distortion_coefficients=params[0],params[1]
+        
     def getPose(self):
         ret, frame = self.cap.read()
 
@@ -22,11 +25,10 @@ class pose_extractor:
             self.kill()
             return None,None
 
-        if len(tvec)>0:
-            return tvec,rpy
-        else:
-            return None,None
-
+        found_pose= len(tvec)>0
+    
+        return tvec,rpy,found_pose
+    
     def kill(self):
         # When everything done, release the capture
         self.cap.release()

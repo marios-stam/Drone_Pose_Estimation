@@ -31,8 +31,8 @@ def rotationMatrixToEulerAngles(R) :
         z = 0
 
     #convert from rads to degrees
-    x=math.degrees(x)
-    y=math.degrees(y)
-    z=math.degrees(z)
+    # x=math.degrees(x)
+    # y=math.degrees(y)
+    # z=math.degrees(z)
 
     return np.array([x, y, z])
