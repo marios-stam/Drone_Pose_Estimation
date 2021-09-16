@@ -125,4 +125,8 @@ if __name__=="__main__":
         save_coefficients(mtx,dist,"calibration/cameraCoeffs.yml")
     else:
         camera_matrix, dist_matrix=load_coefficients("calibration/cameraCoeffs.yml")
+        print("camera_matrix:")
+        print(camera_matrix)
+        print("dist_matrix:")
+        print(dist_matrix)
     pass
