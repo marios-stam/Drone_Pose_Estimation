@@ -19,16 +19,6 @@ add_parent_folder_to_path()
 
 from calibration import calibration
 
-from os.path import dirname, abspath
-
-
-parent_dir_path = dirname(dirname(abspath(__file__)))
-camera_matrix,distortion_matrix=calibration.load_coefficients(parent_dir_path + "/calibration/cameraCoeffs.yml")
-print("camera_matrix:")
-print(camera_matrix)
-print("distortion_matrix:")
-print(distortion_matrix)
-
 def Project(points, intrinsic, distortion):
   result = []
   rvec = tvec = np.array([0.0, 0.0, 0.0])
@@ -48,6 +38,8 @@ def Unproject(points, Z, intrinsic, distortion):
     points_undistorted = np.array([])
     if len(points) > 0:
         points_undistorted = cv2.undistortPoints(np.expand_dims(points, axis=1), intrinsic, distortion, P=intrinsic)
+        # points_undistorted = cv2.undistortPoints(np.float32([[points]]), intrinsic, distortion, P=intrinsic)
+
     points_undistorted = np.squeeze(points_undistorted, axis=1) 
     # Step 2. Reproject.
     result = []
