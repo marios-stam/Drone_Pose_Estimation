@@ -1,0 +1,7 @@
+%YAML:1.0
+---
+pol: !!opencv-matrix
+   rows: 2
+   cols: 1
+   dt: d
+   data: [ 2.4999999999999979e-04, 1.0990647210786425e-15 ]

@@ -158,12 +158,13 @@ class pose_extractor_CV_techniques:
         self.cap.release()
         cv2.destroyAllWindows()
 
-pose_estimator=pose_extractor_CV_techniques()
-while (1):
-    pose_estimator.getPose()
+# pose_estimator=pose_extractor_CV_techniques()
+# while (1):
+#     pose_estimator.getPose()
 
 if __name__=="__main__":
     p = calculate_pol_for_area_to_depth()
-    # save_pol_for_area_to_depth('pol_area_depth.yml',p)
-    p=load_pol_for_area_to_depth('pol_area_depth.yml')
+    parent_dir_path = dirname(dirname(abspath(__file__)))
+    save_pol_for_area_to_depth(parent_dir_path+'/CV_techniques/pol_area_depth.yml',p)
+    p=load_pol_for_area_to_depth(parent_dir_path+'/CV_techniques/pol_area_depth.yml')
     print(p)
