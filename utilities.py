@@ -2,11 +2,15 @@ import cv2
 from imutils.video import VideoStream
 
 def getVideoCap(usb=True):
-    int_camera_index=2
-    usb_camera_index=0
+    int_camera_index=0
+    usb_camera_index=2
     if(usb):
         cap = cv2.VideoCapture(usb_camera_index)
         cap.set(cv2.CAP_PROP_FPS, 30)
+        # W, H = 1920, 1080
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)
+        # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     else:
         cap = cv2.VideoCapture(int_camera_index)
     
