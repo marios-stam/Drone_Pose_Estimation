@@ -6,9 +6,10 @@ from .camera_model import Unproject
 from os.path import dirname, abspath
 from matplotlib import pyplot as plt
 from pandas_ods_reader import read_ods
+#if not executed in ROS wokspace the parameters (CAMERA_HEIGHT,CONTOUR_AREA_THRESHOLD) must be defined manually
+
 
 def add_parent_folder_to_path():
-    # print ("current file:",cv2.__file__)
     # getting the name of the directory
     # where the this file is present.
     current = os.path.dirname(os.path.realpath(__file__))
@@ -31,7 +32,7 @@ from calibration import calibration
 cap = cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/phone_edited.mp4')
 # cap = cv2.VideoCapture(0)
 
-AREA_THRESHOLD=400
+
 
 def get_max_contour_area(contours):
     max_area=0
@@ -100,7 +101,8 @@ def get_center_of_contour(contour)->list:
     return center
 
 class pose_extractor_CV_techniques:
-    def __init__(self,USB_cam=1):
+    def __init__(self,camera_height,contour_area_thresh,USB_cam=1):
+
         # self.cap = getVideoCap(usb=USB_cam)
         # self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/phone_edited.mp4')
         self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/area_depth_97cm.mp4')
@@ -113,6 +115,11 @@ class pose_extractor_CV_techniques:
         
         self.z_estimation_polynomial=load_pol_for_area_to_depth(parent_dir_path+'/CV_techniques/pol_area_depth.yml')
 
+        self.actual_height =0
+        #parameters
+        self.CAMERA_HEIGHT = camera_height
+        self.CONTOUR_AREA_THRESHOLD = contour_area_thresh
+        
     def visualise(self,frame,gblur):
         cv2.imshow('original', frame)
         cv2.imshow('first frame', gblur)
@@ -154,7 +161,7 @@ class pose_extractor_CV_techniques:
 
         found_pose=False
         max_area, max_i = get_max_contour_area(contours)
-        max_area_criterion = max_area > AREA_THRESHOLD
+        max_area_criterion = max_area > self.CONTOUR_AREA_THRESHOLD
         
         if not max_area_criterion:
             self.visualise(frame,gblur)
@@ -163,7 +170,13 @@ class pose_extractor_CV_techniques:
         # cv2.drawContours(frame, contours, -1, (0, 0, 255), 6)
         max_contour=contours[max_i]
         draw_bounding_box(max_contour,frame)
+        
+        #TODO:maybe fuse the above together into one value
+        
         z = estimate_z_based_on_contour(max_contour,self.z_estimation_polynomial)
+        
+        z=np.array( [self.CAMERA_HEIGHT-self.actual_height] )
+       
         contour_center = get_center_of_contour(max_contour)
         xy= self.estimate_xy_based_on_z(contour_center,z)
         
@@ -180,6 +193,10 @@ class pose_extractor_CV_techniques:
         # When everything done, release the capture
         self.cap.release()
         cv2.destroyAllWindows()
+
+    def update_actual_height(self,new_height):
+        self.actual_height = new_height
+        # print("self.actual_height:",self.actual_height)
 
 # pose_estimator=pose_extractor_CV_techniques()
 # while (1):
