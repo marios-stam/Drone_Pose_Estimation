@@ -2,7 +2,13 @@ import numpy as np
 import cv2
 from cv2 import bgsegm
 import os,sys
-from .camera_model import Unproject
+current = os.path.dirname(os.path.realpath(__file__))
+
+if (__file__=="/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/CV_techniques/pose_extractor_CV.py"):
+    from .camera_model import Unproject
+else:
+    from .camera_model import Unproject
+
 from os.path import dirname, abspath
 from matplotlib import pyplot as plt
 from pandas_ods_reader import read_ods
@@ -101,11 +107,11 @@ def get_center_of_contour(contour)->list:
     return center
 
 class pose_extractor_CV_techniques:
-    def __init__(self,camera_height,contour_area_thresh,USB_cam=1):
-
+    def __init__(self,camera_height=5,contour_area_thresh=400,use_depth_from_tello=False,USB_cam=1):
+        
         # self.cap = getVideoCap(usb=USB_cam)
-        # self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/phone_edited.mp4')
-        self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/area_depth_97cm.mp4')
+        self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/tello_flight1.mp4')
+        # self.cap=cv2.VideoCapture('/home/marios/catkin_ws/src/thesis_drone/src/Drone_Pose_Estimation/test_videos/area_depth_79cm.mp4')
         
         parent_dir_path = dirname(dirname(abspath(__file__)))
         params=calibration.load_coefficients(parent_dir_path+"/calibration/cameraCoeffs.yml")
@@ -116,10 +122,12 @@ class pose_extractor_CV_techniques:
         self.z_estimation_polynomial=load_pol_for_area_to_depth(parent_dir_path+'/CV_techniques/pol_area_depth.yml')
 
         self.actual_height =0
+        self.rot = []
         #parameters
         self.CAMERA_HEIGHT = camera_height
         self.CONTOUR_AREA_THRESHOLD = contour_area_thresh
-        
+        self.USE_DEPTH_FROM_TELLO = use_depth_from_tello
+
     def visualise(self,frame,gblur):
         cv2.imshow('original', frame)
         cv2.imshow('first frame', gblur)
@@ -172,10 +180,10 @@ class pose_extractor_CV_techniques:
         draw_bounding_box(max_contour,frame)
         
         #TODO:maybe fuse the above together into one value
-        
-        z = estimate_z_based_on_contour(max_contour,self.z_estimation_polynomial)
-        
-        z=np.array( [self.CAMERA_HEIGHT-self.actual_height] )
+        if (not self.USE_DEPTH_FROM_TELLO):
+            z = estimate_z_based_on_contour(max_contour,self.z_estimation_polynomial)
+        else:
+            z=np.array( [self.CAMERA_HEIGHT-self.actual_height] )
        
         contour_center = get_center_of_contour(max_contour)
         xy= self.estimate_xy_based_on_z(contour_center,z)
@@ -197,6 +205,8 @@ class pose_extractor_CV_techniques:
     def update_actual_height(self,new_height):
         self.actual_height = new_height
         # print("self.actual_height:",self.actual_height)
+    def update_rpy(self,rot):
+        self.rot = rot
 
 # pose_estimator=pose_extractor_CV_techniques()
 # while (1):
