@@ -14,7 +14,6 @@ from matplotlib import pyplot as plt
 from pandas_ods_reader import read_ods
 #if not executed in ROS wokspace the parameters (CAMERA_HEIGHT,CONTOUR_AREA_THRESHOLD) must be defined manually
 
-
 def add_parent_folder_to_path():
     # getting the name of the directory
     # where the this file is present.
@@ -32,6 +31,7 @@ add_parent_folder_to_path()
 
 from utilities import getVideoCap 
 from calibration import calibration
+import filtering
 
 #cap = cv2.VideoCapture('people-walking.mp4')
 #cap = cv2.VideoCapture('Ball_Bouncing.mp4')
@@ -123,6 +123,9 @@ class pose_extractor_CV_techniques:
 
         self.actual_height =0
         self.rot = []
+
+        self.filter = filtering.StreamingMovingAverage(window_size=40)
+
         #parameters
         self.CAMERA_HEIGHT = camera_height
         self.CONTOUR_AREA_THRESHOLD = contour_area_thresh
@@ -167,10 +170,8 @@ class pose_extractor_CV_techniques:
             self.visualise(frame,gblur)
             return None,None,False
 
-        found_pose=False
         max_area, max_i = get_max_contour_area(contours)
-        max_area_criterion = max_area > self.CONTOUR_AREA_THRESHOLD
-        
+        max_area_criterion = max_area > self.CONTOUR_AREA_THRESHOLD     
         if not max_area_criterion:
             self.visualise(frame,gblur)
             return None,None,False
@@ -179,9 +180,12 @@ class pose_extractor_CV_techniques:
         max_contour=contours[max_i]
         draw_bounding_box(max_contour,frame)
         
-        #TODO:maybe fuse the above together into one value
+        #TODO:maybe fuse the below into one value
         if (not self.USE_DEPTH_FROM_TELLO):
             z = estimate_z_based_on_contour(max_contour,self.z_estimation_polynomial)
+            print("z raw:",z)
+            z = np.array( [ self.filter.process(z) ] )
+            print("z filtered:",z)
         else:
             z=np.array( [self.CAMERA_HEIGHT-self.actual_height] )
        
