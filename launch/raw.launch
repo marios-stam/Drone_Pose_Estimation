@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <node name="raw_data" pkg="Drone_Pose_Estimation" type="get_raw.py" />
+
+  
+</launch>
