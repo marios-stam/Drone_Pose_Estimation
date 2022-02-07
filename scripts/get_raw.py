@@ -64,6 +64,8 @@ class DroneMarker(Marker):
 
 def main():
     droneMarkPub = rospy.Publisher('robotMarker', Marker, queue_size=10)
+    # tf broadcaster
+    tf_br = tf.TransformBroadcaster()
 
     rospy.init_node('drone_tracker')
     rate = rospy.Rate(20)  # 20hz
@@ -73,7 +75,6 @@ def main():
 
     robotMarker = DroneMarker()
 
-    # addBox()
     if USE_ARUCO:
         pose_estimator = pose_extractor(USB_cam=USB_CAM)
     else:
@@ -95,12 +96,18 @@ def main():
 
         if found_pose:
             x, y, z = tvec[0][0][0], tvec[0][0][1], tvec[0][0][2]
-            scale_div = 10
+            scale_div = 1
             x, y, z = -x/scale_div, -y/scale_div, z/scale_div
             pos = [x, y, z]
 
             rpy = (0, math.pi, rpy[2])
             robotMarker.updatePose(pos, rpy)
+
+            # publish tf
+            q = transformations.quaternion_from_euler(rpy[0], rpy[1], rpy[2])
+            tf_br.sendTransform(pos, q, rospy.Time.now(), "robot", "world")
+
+            droneMarkPub.publish(robotMarker)
 
         droneMarkPub.publish(robotMarker)
         rate.sleep()
