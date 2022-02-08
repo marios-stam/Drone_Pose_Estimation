@@ -68,7 +68,8 @@ def main():
     tf_br = tf.TransformBroadcaster()
 
     rospy.init_node('drone_tracker')
-    rate = rospy.Rate(20)  # 20hz
+    loop_frequency = 20  # hz
+    rate = rospy.Rate(loop_frequency)
 
     translation = (0.0, 0.0, 0.0)
     rotation = (0.0, 0.0, 0.0, 1.0)
@@ -97,7 +98,9 @@ def main():
         if found_pose:
             x, y, z = tvec[0][0][0], tvec[0][0][1], tvec[0][0][2]
             scale_div = 1
-            x, y, z = -x/scale_div, -y/scale_div, z/scale_div
+            # x, y, z = -x/scale_div, -y/scale_div, z/scale_div
+            x, y, z = x/scale_div, y/scale_div, z/scale_div
+
             pos = [x, y, z]
 
             rpy = (0, math.pi, rpy[2])

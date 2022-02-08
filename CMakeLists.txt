@@ -162,7 +162,8 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/get_raw.py
   scripts/kalman_estimation.py
-  
+  scripts/custom_logging.py
+
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
