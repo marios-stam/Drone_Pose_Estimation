@@ -27,13 +27,38 @@ if __name__ == '__main__':
     # print("z_mean:", z_mean)
     # print("z_std:", z_std)
 
+    fig = plt.figure()
+    plt.subplot(3, 1, 1)
     plt.plot(raw.t, raw.x)
     plt.plot(filtered.t, filtered.x)
     plt.legend(["raw", "filtered"])
     plt.grid()
 
-    plt.title("RAW vs FILTERED")
+    plt.title("X")
     plt.xlabel("t")
     plt.ylabel("x")
+
+    plt.subplot(3, 1, 2)
+    plt.plot(raw.t, raw.y)
+    plt.plot(filtered.t, filtered.y)
+    plt.legend(["raw", "filtered"])
+    plt.grid()
+
+    plt.title("Y")
+    plt.xlabel("t")
+    plt.ylabel("y")
+
+    plt.subplot(3, 1, 3)
+    plt.plot(raw.t, raw.z)
+    plt.plot(filtered.t, filtered.z)
+    plt.legend(["raw", "filtered"])
+    plt.grid()
+
+    plt.title("Z")
+    plt.xlabel("t")
+    plt.ylabel("z")
+
+    # set the spacing between subplots
+    plt.subplots_adjust(hspace=0.46)
 
     plt.show()

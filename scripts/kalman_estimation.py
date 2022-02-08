@@ -30,6 +30,9 @@ def get_measurement():
         return None
 
 
+get_measurement.prev_x = None
+
+
 def init_kalman_1D(dt):
     # init Kalman Params
     f = KalmanFilter(dim_x=2, dim_z=1)
@@ -54,12 +57,55 @@ def init_kalman_1D(dt):
     return f
 
 
-def update_F(dt):
+def update_F_1D(dt):
     return np.array([[1., dt],
                      [0., 1.]])
 
 
-get_measurement.prev_x = None
+def init_kalman_3D(dt):
+    f = KalmanFilter(dim_x=6, dim_z=3)
+
+    # initial conditions
+    f.x = np.array(np.zeros((6, 1)))
+
+    # state transition matrix
+    f.F = update_F_3D(dt)
+
+    # measurement function
+    f.H = np.array([
+        [1., 0., 0., 0., 0., 0.],
+        [0., 1., 0., 0., 0., 0.],
+        [0., 0., 1., 0., 0., 0.]
+    ])
+
+    # covariance matrix
+    f.P *= 1
+
+    #  measurement noise
+    f.R = np.eye(3) * 0.1
+
+    print("f.R.shape", f.R.shape)
+
+    # process noise
+    # making Q from 3x3 to 6x6 matrix
+    # Q = Q_discrete_white_noise(dim=3, dt=dt, var=0.1)
+    # Q = np.concatenate((Q, Q), axis=0)
+    # Q = np.concatenate((Q, Q), axis=1)
+
+    f.Q = np.eye(6) * 0.1
+
+    return f
+
+
+def update_F_3D(dt):
+    return np.array([[1, 0, 0, dt, 0, 0],
+                    [0, 1, 0, 0, dt, 0],
+                    [0, 0, 1, 0, 0, dt],
+                    [0, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 1]
+                     ])
+
 
 if __name__ == '__main__':
     # tf subscriber
@@ -67,11 +113,12 @@ if __name__ == '__main__':
     listener = tf.TransformListener()
     tf_br = tf.TransformBroadcaster()
 
-    loop_frequency = 10  # hz
+    loop_frequency = 20  # hz
     rate = rospy.Rate(loop_frequency)
     dt = 1/loop_frequency
 
     f1D = init_kalman_1D(dt)
+    f3D = init_kalman_3D(dt)
 
     t0 = rospy.get_time()
     lossed_frames = 0
@@ -84,12 +131,24 @@ if __name__ == '__main__':
 
         dt = z[0]-t0
 
-        f1D.F = update_F(dt)
-        f1D.predict()
-        f1D.update(z[1])
-        estimation = f1D.x
+        # f1D.F = update_F_1D(dt)
+        # f1D.predict()
+        # f1D.update(z[1])
+        # estimation = f1D.x
+        # print("estimation:", estimation)
+        # pos = [estimation[0], 0, 0]
+        # tf_br.sendTransform(pos, [0, 0, 0, 1],
+        #                     rospy.Time.now(), "robot_kalman", "world")
+
+        measurement = z[1:4]
+        print(len(measurement))
+        f3D.F = update_F_3D(dt)
+        f3D.predict()
+        f3D.update(measurement)
+
+        estimation = f3D.x
         print("estimation:", estimation)
-        pos = [estimation[0], 0, 0]
+        pos = [estimation[0], estimation[1], estimation[2]]
         tf_br.sendTransform(pos, [0, 0, 0, 1],
                             rospy.Time.now(), "robot_kalman", "world")
 
