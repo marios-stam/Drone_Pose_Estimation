@@ -121,6 +121,8 @@ if __name__ == '__main__':
     f3D = init_kalman_3D(dt)
 
     t0 = rospy.get_time()
+    first_measurement_taken = False
+
     lossed_frames = 0
     while not rospy.is_shutdown():
         z = get_measurement()  # returns array [t,x,y,z,qx,qy,qz,qw]
@@ -128,6 +130,10 @@ if __name__ == '__main__':
         if z is None:
             lossed_frames += 1
             continue
+
+        if first_measurement_taken == False:
+            first_measurement_taken = True
+            t0 = z[0]
 
         dt = z[0]-t0
 
