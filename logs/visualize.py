@@ -30,6 +30,7 @@ if __name__ == '__main__':
     plt.plot(raw.t, raw.x)
     plt.plot(filtered.t, filtered.x)
     plt.legend(["raw", "filtered"])
+    plt.grid()
 
     plt.title("RAW vs FILTERED")
     plt.xlabel("t")

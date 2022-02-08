@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
         print("i_raw: ", i_raw, "i_filtered: ", i_filtered)
 
-        if i_raw > measurements_number and i_filtered > measurements_number:
+        if i_raw >= measurements_number and i_filtered >= measurements_number:
             break
 
         rate.sleep()
