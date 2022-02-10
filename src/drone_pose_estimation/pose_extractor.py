@@ -7,9 +7,23 @@ import cv2
 import os
 
 
+class recorded_video_loader:
+    def __init__(self, video_file_name) -> None:
+        # load video
+        self.cap = cv2.VideoCapture(video_file_name)
+
+
 class pose_extractor:
-    def __init__(self, USB_cam=1):
-        self.cap = getVideoCap(usb=USB_cam)
+    def __init__(self, use_live_video, USB_cam=0, recorded_video_file_name=None):
+
+        if use_live_video:
+            self.cap = getVideoCap(usb=USB_cam)
+        else:
+            if recorded_video_file_name is None:
+                raise Exception("video_file_name is None")
+            # load video from file
+            self.cap = cv2.VideoCapture(recorded_video_file_name)
+
         params = calibration.load_coefficients(
             "/home/marios/catkin_ws/src/Drone_Pose_Estimation/src/drone_pose_estimation/calibration/cameraCoeffs.yml")
         print("params:", params)
@@ -24,6 +38,7 @@ class pose_extractor:
         matrix_coefficients, distortion_coefficients = self.matrix_coefficients, self.distortion_coefficients
         frame, tvec, rpy = pose_estimation_simple(
             frame, matrix_coefficients, distortion_coefficients)
+
         # flip frame to make it easier for user to test it live
         frame = cv2.flip(frame, 1)
 

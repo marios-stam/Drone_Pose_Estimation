@@ -8,10 +8,15 @@ from visualization_msgs.msg import Marker
 from tf import transformations
 import rospy
 import math
+import random
 
 # from GLOBAL_PARAMETERS import CAMERA_HEIGHT, USB_CAM, USE_ARUCO, CONTOUR_AREA_THRESHOLD
+USE_LIVE_VIDEO = 0
+
 USE_ARUCO = 1
 USB_CAM = 0
+
+RECORDED_VIDEO_FILENAME = "/home/marios/catkin_ws/src/Drone_Pose_Estimation/src/drone_pose_estimation/test_videos/aruco_test_1.mp4"
 
 curr_folder = os.path.dirname(os.path.realpath(__file__))
 print("current file:", curr_folder)
@@ -68,7 +73,7 @@ def main():
     tf_br = tf.TransformBroadcaster()
 
     rospy.init_node('drone_tracker')
-    loop_frequency = 20  # hz
+    loop_frequency = 40  # hz
     rate = rospy.Rate(loop_frequency)
 
     translation = (0.0, 0.0, 0.0)
@@ -77,7 +82,8 @@ def main():
     robotMarker = DroneMarker()
 
     if USE_ARUCO:
-        pose_estimator = pose_extractor(USB_cam=USB_CAM)
+        pose_estimator = pose_extractor(
+            use_live_video=USE_LIVE_VIDEO, recorded_video_file_name=RECORDED_VIDEO_FILENAME, USB_cam=USB_CAM)
     else:
         pose_estimator = pose_extractor_CV_techniques(camera_height=CAMERA_HEIGHT,
                                                       contour_area_thresh=CONTOUR_AREA_THRESHOLD, USB_cam=USB_CAM)
@@ -102,6 +108,11 @@ def main():
             x, y, z = x/scale_div, y/scale_div, z/scale_div
 
             pos = [x, y, z]
+            # add gaussan noise
+            st_dev = 1
+            pos[0] += random.gauss(0, st_dev)
+            pos[1] += random.gauss(0, st_dev)
+            pos[2] += random.gauss(0, st_dev)
 
             rpy = (0, math.pi, rpy[2])
             robotMarker.updatePose(pos, rpy)

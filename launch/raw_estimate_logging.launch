@@ -2,7 +2,7 @@
 <launch>
 
   <node name="logger" pkg="Drone_Pose_Estimation" type="custom_logging.py" />
-  <node name="kalamn_filter" pkg="Drone_Pose_Estimation" type="kalman_estimation.py" />
+  <node name="kalamn_filter" pkg="Drone_Pose_Estimation" type="kalman_estimation.py" output="screen" />
   <node name="raw_data" pkg="Drone_Pose_Estimation" type="get_raw.py" />
 
   

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class log_data:
@@ -26,12 +27,15 @@ if __name__ == '__main__':
     # z_std = z.std()
     # print("z_mean:", z_mean)
     # print("z_std:", z_std)
+    marker_size = 3
 
-    fig = plt.figure()
+    # fig = plt.figure()
     plt.subplot(3, 1, 1)
-    plt.plot(raw.t, raw.x)
-    plt.plot(filtered.t, filtered.x)
-    plt.legend(["raw", "filtered"])
+    plt.plot(raw.t, raw.x, linestyle="",
+             marker='x', markersize=marker_size, label='raw')
+    plt.plot(filtered.t, filtered.x, linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.legend()
     plt.grid()
 
     plt.title("X")
@@ -39,9 +43,12 @@ if __name__ == '__main__':
     plt.ylabel("x")
 
     plt.subplot(3, 1, 2)
-    plt.plot(raw.t, raw.y)
-    plt.plot(filtered.t, filtered.y)
-    plt.legend(["raw", "filtered"])
+    # plt.figure()
+    plt.plot(raw.t, raw.y, linestyle="",
+             marker='x', markersize=marker_size, label='raw')
+    plt.plot(filtered.t, filtered.y,  # linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.legend()
     plt.grid()
 
     plt.title("Y")
@@ -49,9 +56,12 @@ if __name__ == '__main__':
     plt.ylabel("y")
 
     plt.subplot(3, 1, 3)
-    plt.plot(raw.t, raw.z)
-    plt.plot(filtered.t, filtered.z)
-    plt.legend(["raw", "filtered"])
+    # plt.figure()
+    plt.plot(raw.t, raw.z, linestyle="",
+             marker='x', markersize=marker_size, label='raw')
+    plt.plot(filtered.t, filtered.z, linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.legend()
     plt.grid()
 
     plt.title("Z")
@@ -60,5 +70,16 @@ if __name__ == '__main__':
 
     # set the spacing between subplots
     plt.subplots_adjust(hspace=0.46)
+
+    # 3d plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot(raw.x, raw.y, raw.z, linestyle="",
+            marker='x', markersize=marker_size, label='raw')
+
+    ax.plot(filtered.x, filtered.y, filtered.z,
+            marker='o', markersize=marker_size, label='filtered')
+    ax.legend()
 
     plt.show()

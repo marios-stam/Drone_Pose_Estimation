@@ -67,6 +67,7 @@ def init_kalman_3D(dt):
 
     # initial conditions
     f.x = np.array(np.zeros((6, 1)))
+    f.x[2] = 80
 
     # state transition matrix
     f.F = update_F_3D(dt)
@@ -87,10 +88,17 @@ def init_kalman_3D(dt):
     print("f.R.shape", f.R.shape)
 
     # process noise
-    # making Q from 3x3 to 6x6 matrix
-    # Q = Q_discrete_white_noise(dim=3, dt=dt, var=0.1)
-    # Q = np.concatenate((Q, Q), axis=0)
-    # Q = np.concatenate((Q, Q), axis=1)
+    # making Q from 2x2(for each dimension) to 6x6 matrix
+    Q = np.zeros((6, 6))
+
+    Qi = Q_discrete_white_noise(dim=2, dt=dt, var=0.1)
+    Q[0, 0:2] = Qi[0, :]
+    Q[1, 2:4] = Qi[0, :]
+    Q[2, 4:6] = Qi[0, :]
+
+    Q[3, 0:2] = Qi[1, :]
+    Q[4, 2:4] = Qi[1, :]
+    Q[5, 4:6] = Qi[1, :]
 
     f.Q = np.eye(6) * 0.1
 
@@ -113,9 +121,12 @@ if __name__ == '__main__':
     listener = tf.TransformListener()
     tf_br = tf.TransformBroadcaster()
 
-    loop_frequency = 20  # hz
+    loop_frequency = 30  # hz
     rate = rospy.Rate(loop_frequency)
-    dt = 1/loop_frequency
+    dt_init = 1/loop_frequency
+
+    # copy dt_init
+    dt = dt_init
 
     f1D = init_kalman_1D(dt)
     f3D = init_kalman_3D(dt)
@@ -127,15 +138,12 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         z = get_measurement()  # returns array [t,x,y,z,qx,qy,qz,qw]
 
-        if z is None:
-            lossed_frames += 1
-            continue
-
-        if first_measurement_taken == False:
+        if type(z) != type(None) and first_measurement_taken == False:
             first_measurement_taken = True
             t0 = z[0]
-
-        dt = z[0]-t0
+        else:
+            if not first_measurement_taken:
+                continue
 
         # f1D.F = update_F_1D(dt)
         # f1D.predict()
@@ -145,10 +153,13 @@ if __name__ == '__main__':
         # pos = [estimation[0], 0, 0]
         # tf_br.sendTransform(pos, [0, 0, 0, 1],
         #                     rospy.Time.now(), "robot_kalman", "world")
+        try:
+            dt = z[0]-t0
+            measurement = z[1:4]
+        except:
+            measurement = None
 
-        measurement = z[1:4]
-        print(len(measurement))
-        f3D.F = update_F_3D(dt)
+        # f3D.F = update_F_3D(dt)
         f3D.predict()
         f3D.update(measurement)
 
