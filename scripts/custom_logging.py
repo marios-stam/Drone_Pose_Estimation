@@ -42,6 +42,9 @@ if __name__ == '__main__':
     measurements_number = 100
     log_raw, i_raw = np.zeros((measurements_number, 8)), 0
     log_filtered, i_filtered = np.zeros((measurements_number, 8)), 0
+    log_filtered_accel, i_filtered_accel = np.zeros((measurements_number, 8)), 0
+    log_filtered_jerk, i_filtered_jerk = np.zeros((measurements_number, 8)), 0
+
 
     i = 0
     t0 = rospy.get_time()
@@ -49,10 +52,15 @@ if __name__ == '__main__':
         log_raw, i_raw = lookup_transform('robot', log_raw, i_raw)
         log_filtered, i_filtered = lookup_transform(
             'robot_kalman', log_filtered, i_filtered)
+        log_filtered_accel, i_filtered_accel = lookup_transform(
+            'robot_kalman_accel', log_filtered_accel, i_filtered_accel)
+        log_filtered_jerk, i_filtered_jerk = lookup_transform(
+            'robot_kalman_jerk', log_filtered_jerk, i_filtered_jerk)
 
-        print("i_raw: ", i_raw, "i_filtered: ", i_filtered)
+        print("i_raw: ", i_raw, "i_filtered: ", i_filtered,
+              "i_filtered_accel: ", i_filtered_accel)
 
-        if i_raw >= measurements_number and i_filtered >= measurements_number:
+        if i_raw >= measurements_number and i_filtered >= measurements_number and i_filtered_accel >= measurements_number:
             break
 
         rate.sleep()
@@ -61,3 +69,5 @@ if __name__ == '__main__':
     logs_path = "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/"
     np.savetxt(logs_path + 'raw_values.txt', log_raw)
     np.savetxt(logs_path + 'filtered_values.txt', log_filtered)
+    np.savetxt(logs_path + 'filtered_values_accel.txt', log_filtered_accel)
+    np.savetxt(logs_path + 'filtered_values_jerk.txt', log_filtered_jerk)

@@ -163,7 +163,8 @@ catkin_install_python(PROGRAMS
   scripts/get_raw.py
   scripts/kalman_estimation.py
   scripts/custom_logging.py
-
+  scripts/kalman_initializations.py
+  
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

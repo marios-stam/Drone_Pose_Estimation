@@ -109,7 +109,7 @@ def main():
 
             pos = [x, y, z]
             # add gaussan noise
-            st_dev = 1
+            st_dev = 2
             pos[0] += random.gauss(0, st_dev)
             pos[1] += random.gauss(0, st_dev)
             pos[2] += random.gauss(0, st_dev)
