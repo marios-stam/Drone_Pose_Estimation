@@ -259,6 +259,31 @@ def init_kalman_3D_jerk(dt):
     return f
 
 
+def estimate_and_publish(measurement, kalman_obj: KalmanFilter, model_type):
+    kalman_obj.predict()
+    kalman_obj.update(measurement)
+    estimation = kalman_obj.x
+
+    pos = [estimation[0], estimation[1], estimation[2]]
+    q = [0, 0, 0, 1]
+
+    if model_type == "vel":
+        tf_name = "robot_kalman"
+    else:
+        tf_name = "robot_kalman" + "_" + model_type
+
+    tf_br.sendTransform(pos, q, rospy.Time.now(), tf_name, "world")
+    publish_parameters(kalman_obj, tf_name)
+
+
+def publish_parameters(kalman_obj, tf_name):
+    pos = [kalman_obj.likelihood, kalman_obj.K[0][0], kalman_obj.P[0, 0]]
+    q = [0, 0, 0, 1]
+
+    tf_br.sendTransform(pos, q, rospy.Time.now(),
+                        tf_name+"_variables", "world")
+
+
 if __name__ == '__main__':
     # tf subscriber
     rospy.init_node('kalman_estimation', anonymous=True)
@@ -291,47 +316,14 @@ if __name__ == '__main__':
             if not first_measurement_taken:
                 continue
 
-        # f1D.F = update_F_1D(dt)
-        # f1D.predict()
-        # f1D.update(z[1])
-        # estimation = f1D.x
-        # print("estimation:", estimation)
-        # pos = [estimation[0], 0, 0]
-        # tf_br.sendTransform(pos, [0, 0, 0, 1],
-        #                     rospy.Time.now(), "robot_kalman", "world")
         try:
             dt = z[0]-t0
             measurement = z[1:4]
         except:
             measurement = None
 
-        # f3D.F = update_F_3D(dt)
-        f3D.predict()
-        f3D.update(measurement)
-
-        f3D_accel.predict()
-        f3D_accel.update(measurement)
-
-        f3D_jerk.predict()
-        f3D_jerk.update(measurement)
-
-        estimation = f3D.x
-        estimation_accel = f3D_accel.x
-        estimation_jerk = f3D_jerk.x
-
-        print("estimation:", estimation)
-        pos = [estimation[0], estimation[1], estimation[2]]
-        tf_br.sendTransform(pos, [0, 0, 0, 1],
-                            rospy.Time.now(), "robot_kalman", "world")
-
-        print("estimation_accel:", estimation_accel)
-        pos = [estimation_accel[0], estimation_accel[1], estimation_accel[2]]
-        tf_br.sendTransform(pos, [0, 0, 0, 1],
-                            rospy.Time.now(), "robot_kalman_accel", "world")
-
-        print("estimation_jerk:", estimation_jerk)
-        pos = [estimation_jerk[0], estimation_jerk[1], estimation_jerk[2]]
-        tf_br.sendTransform(pos, [0, 0, 0, 1],
-                            rospy.Time.now(), "robot_kalman_jerk", "world")
+        estimate_and_publish(measurement, f3D, "vel")
+        estimate_and_publish(measurement, f3D_accel, "accel")
+        estimate_and_publish(measurement, f3D_jerk, "jerk")
 
         rate.sleep()

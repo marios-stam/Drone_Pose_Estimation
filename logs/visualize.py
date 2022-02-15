@@ -48,27 +48,14 @@ def plot_filtered_data(raw, filtered_data_list):
     plt.subplots_adjust(hspace=0.46)
 
 
-if __name__ == '__main__':
-    logs_path = "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/"
-
-    raw = log_data(logs_path+'raw_values.txt')
-    filtered = log_data(logs_path+'filtered_values.txt')
-    filtered_accel = log_data(logs_path+'filtered_values_accel.txt')
-    filtered_jerk = log_data(logs_path+'filtered_values_jerk.txt')
-
-    # plot_filtered_data(raw, [filtered, filtered_accel])
-    # z_mean = np.mean(z)
-    # z_std = z.std()
-    # print("z_mean:", z_mean)
-    # print("z_std:", z_std)
-
+def plot_coordinates(raw, filtered, filtered_accel, filtered_jerk):
     marker_size = 3
     marker_size_raw = marker_size+4
 
-    # fig = plt.figure()
+    plt.figure()
     plt.subplot(3, 1, 1)
-    plt.plot(raw.t, raw.x, linestyle="",
-             marker='x', markersize=marker_size_raw, label='raw')
+    plt.plot(raw.t, raw.x, linestyle="", marker='x',
+             markersize=marker_size_raw, label='raw')
     plt.plot(filtered.t, filtered.x, linestyle="",
              marker='o', markersize=marker_size, label='filtered')
     plt.plot(filtered_accel.t, filtered_accel.x, linestyle="",
@@ -122,6 +109,8 @@ if __name__ == '__main__':
     # set the spacing between subplots
     plt.subplots_adjust(hspace=0.46)
 
+
+def plot3D(raw, filtered, filtered_accel, filtered_jerk):
     marker_size = 3
     marker_size_raw = marker_size+4
     # 3d plot
@@ -141,5 +130,86 @@ if __name__ == '__main__':
             marker='o', markersize=marker_size, label='filtered_jerk')
 
     ax.legend()
+
+    ax.set_xlabel('X', fontsize=20)
+    ax.set_ylabel('Y', fontsize=20)
+    ax.set_zlabel('Z', fontsize=20)
+
+
+def plot_filter_variables(filtered, filtered_accel, filtered_jerk):
+    marker_size = 3
+    marker_size_raw = marker_size+4
+
+    plt.figure()
+    plt.subplot(3, 1, 1)
+    plt.plot(filtered.t, filtered.x, linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.plot(filtered_accel.t, filtered_accel.x, linestyle="",
+             marker='o', markersize=marker_size, label='filtered_accel')
+
+    plt.plot(filtered_jerk.t, filtered_jerk.x, linestyle="",
+             marker='o', markersize=marker_size, label='filtered_jerk')
+
+    plt.legend()
+    plt.grid()
+
+    plt.title("Likelihood")
+    plt.xlabel("t")
+    plt.ylabel("Likelihood")
+
+    plt.subplot(3, 1, 2)
+    plt.plot(filtered.t, filtered.y,  # linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.plot(filtered_accel.t, filtered_accel.y,  # linestyle="",
+             marker='o', markersize=marker_size, label='filtered_accel')
+    plt.plot(filtered_jerk.t, filtered_jerk.y, linestyle="",
+             marker='o', markersize=marker_size, label='filtered_jerk')
+    plt.legend()
+    plt.grid()
+
+    plt.title("K")
+    plt.xlabel("t")
+    plt.ylabel("K")
+
+    plt.subplot(3, 1, 3)
+    plt.plot(filtered.t, filtered.z, linestyle="",
+             marker='o', markersize=marker_size, label='filtered')
+    plt.plot(filtered_accel.t, filtered_accel.z, linestyle="",
+             marker='o', markersize=marker_size, label='filtered_accel')
+    plt.plot(filtered_jerk.t, filtered_jerk.z, linestyle="",
+             marker='o', markersize=marker_size, label='filtered_jerk')
+
+    plt.legend()
+    plt.grid()
+
+    plt.title("P")
+    plt.xlabel("t")
+    plt.ylabel("p")
+
+    # set the spacing between subplots
+    plt.subplots_adjust(hspace=0.46)
+
+
+if __name__ == '__main__':
+    logs_path = "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/"
+
+    raw = log_data(logs_path+'raw_values.txt')
+    filtered = log_data(logs_path+'filtered_values.txt')
+    filtered_variables = log_data(logs_path+'filtered_variables.txt')
+
+    filtered_accel = log_data(logs_path+'filtered_values_accel.txt')
+    filtered_accel_variables = log_data(
+        logs_path+'filtered_variables_accel.txt')
+
+    filtered_jerk = log_data(logs_path+'filtered_values_jerk.txt')
+    filtered_jerk_variables = log_data(
+        logs_path+'filtered_variables_jerk.txt')
+
+    plot_coordinates(raw, filtered, filtered_accel, filtered_jerk)
+
+    plot3D(raw, filtered, filtered_accel, filtered_jerk)
+
+    plot_filter_variables(filtered_variables,
+                          filtered_accel_variables, filtered_jerk_variables)
 
     plt.show()
