@@ -117,7 +117,6 @@ def init_kalman_1D(dt):
 
 def init_kalman_3D(dt):
     f = KalmanFilter(dim_x=6, dim_z=3)
-
     # initial conditions
     f.x = np.array(np.zeros((6, 1)))
     f.x[2] = 80
@@ -153,7 +152,14 @@ def init_kalman_3D(dt):
     Q[4, 2:4] = Qi[1, :]
     Q[5, 4:6] = Qi[1, :]
 
-    f.Q = np.eye(6) * 0.1
+    f.Q = np.array([
+        [dt**4/4, 0, 0, dt**3/2, 0, 0],
+        [0, dt**4/4, 0, 0, dt**3/2, 0],
+        [0, 0, dt**4/4, 0, 0, dt**3/2],
+        [dt**3/2, 0, 0, dt**2, 0, 0],
+        [0, dt**3/2, 0, 0, dt**2, 0],
+        [0, 0, dt**3/2, 0, 0, dt**2]
+    ])
 
     return f
 
@@ -203,7 +209,17 @@ def init_kalman_3D_accel(dt):
     Q[4, 2:4] = Qi[1, :]
     Q[5, 4:6] = Qi[1, :]
 
-    f.Q = np.eye(9) * 0.01
+    f.Q = np.array([
+        [dt**4/4, 0, 0, dt**3/2, 0, 0, dt**2, 0, 0],
+        [0, dt**4/4, 0, 0, dt**3/2, 0, 0, dt**2, 0],
+        [0, 0, dt**4/4, 0, 0, dt**3/2, 0, 0, dt**2],
+        [dt**3/2, 0, 0, dt**2, 0, 0, dt, 0, 0],
+        [0, dt**3/2, 0, 0, dt**2, 0, 0, dt, 0],
+        [0, 0, dt**3/2, 0, 0, dt**2, 0, 0, dt],
+        [dt**2, 0, 0, dt, 0, 0, 1, 0, 0],
+        [0, dt**2, 0, 0, dt, 0, 0, 1, 0],
+        [0, 0, dt**2, 0, 0, dt, 0, 0, 1]
+    ])
 
     return f
 
@@ -276,8 +292,8 @@ def estimate_and_publish(measurement, kalman_obj: KalmanFilter, model_type):
     publish_parameters(kalman_obj, tf_name)
 
 
-def publish_parameters(kalman_obj, tf_name):
-    pos = [kalman_obj.likelihood, kalman_obj.K[0][0], kalman_obj.P[0, 0]]
+def publish_parameters(kalman_obj: KalmanFilter, tf_name):
+    pos = [kalman_obj.log_likelihood, kalman_obj.K[0][0], kalman_obj.P[0, 0]]
     q = [0, 0, 0, 1]
 
     tf_br.sendTransform(pos, q, rospy.Time.now(),
