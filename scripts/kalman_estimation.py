@@ -64,8 +64,7 @@ def update_F_3D_accel(dt):
 def update_F_3D_jerk(dt):
     return np.array(
         [
-            [1, 0, 0, dt, 0, 0,    dt**2/2, 0,
-                0,       dt**3/6, 0,         0],
+            [1, 0, 0, dt, 0, 0,    dt**2/2, 0, 0,       dt**3/6, 0,         0],
             [0, 1, 0, 0, dt, 0,    0,       dt**2 /
                 2,   0,       0,       dt**3/6,   0],
             [0, 0, 1, 0, 0, dt,    0,       0,

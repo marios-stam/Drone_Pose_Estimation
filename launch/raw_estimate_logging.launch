@@ -2,7 +2,7 @@
 <launch>
 
   <!--launch Rviz-->
-  <!-- <node name="Rviz" pkg="rviz" type="rviz" args="-d $(find Drone_Pose_Estimation)/config/rviz_config.rviz"/> -->
+  <node name="Rviz" pkg="rviz" type="rviz" args="-d $(find Drone_Pose_Estimation)/config/rviz_config.rviz"/>
    
   <!--launch DronePoseEstimation-->
   <node name="DronePoseEstimation" pkg="drone_pose_estimation" type="drone_pose_estimation" />

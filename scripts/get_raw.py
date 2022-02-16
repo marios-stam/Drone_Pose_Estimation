@@ -36,7 +36,7 @@ class DroneMarker(Marker):
         self.ns = "robot"
         self.id = 0
         self.type = Marker.MESH_RESOURCE
-        self.mesh_resource = "package://thesis_drone/resources/meshes/Quadcopter.stl"
+        self.mesh_resource = "package://Drone_Pose_Estimation/resources/meshes/Quadcopter.stl"
         self.action = 0
 
         self.updatePose(pos, rpy)
