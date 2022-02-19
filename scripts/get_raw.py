@@ -11,7 +11,7 @@ import math
 import random
 
 # from GLOBAL_PARAMETERS import CAMERA_HEIGHT, USB_CAM, USE_ARUCO, CONTOUR_AREA_THRESHOLD
-USE_LIVE_VIDEO = 0
+USE_LIVE_VIDEO = 1  # if 0 load recorded video
 
 USE_ARUCO = 1
 USB_CAM = 0
