@@ -99,7 +99,10 @@ def main():
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 pass
 
-        tvec, rpy, found_pose = pose_estimator.getPose()
+        try:
+            tvec, rpy, found_pose = pose_estimator.getPose()
+        except Exception as e:
+            print("Opa error:", e)
 
         if found_pose:
             x, y, z = tvec[0][0][0], tvec[0][0][1], tvec[0][0][2]
@@ -122,6 +125,10 @@ def main():
             tf_br.sendTransform(pos, q, rospy.Time.now(), "robot", "world")
 
             droneMarkPub.publish(robotMarker)
+        else:
+            pos = [-123, -123, -123]
+            q = transformations.quaternion_from_euler(0, 0, 0)
+            # tf_br.sendTransform(pos, q, rospy.Time.now(), "robot", "world")
 
         droneMarkPub.publish(robotMarker)
         rate.sleep()

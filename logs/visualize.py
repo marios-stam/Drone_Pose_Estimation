@@ -52,7 +52,10 @@ def plot_coordinates(raw, filtered, filtered_accel, filtered_jerk):
     marker_size = 3
     marker_size_raw = marker_size+4
 
-    plt.figure()
+    fig = plt.figure()
+    fig.suptitle('Measurement noise:{}    Process noise:{} '.format(
+        noises[0], noises[1]), fontsize=16)
+
     plt.subplot(3, 1, 1)
     plt.plot(raw.t, raw.x, linestyle="", marker='x',
              markersize=marker_size_raw, label='raw')
@@ -140,7 +143,10 @@ def plot_filter_variables(filtered, filtered_accel, filtered_jerk):
     marker_size = 3
     marker_size_raw = marker_size+4
 
-    plt.figure()
+    fig = plt.figure()
+    fig.suptitle('Measurement noise:{}    Process noise:{} '.format(
+        noises[0], noises[1]), fontsize=16)
+
     plt.subplot(3, 1, 1)
     plt.plot(filtered.t, filtered.x, linestyle="",
              marker='o', markersize=marker_size, label='filtered')
@@ -192,6 +198,8 @@ def plot_filter_variables(filtered, filtered_accel, filtered_jerk):
 
 if __name__ == '__main__':
     logs_path = "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/"
+
+    noises = np.loadtxt(logs_path+"noises.txt")
 
     raw = log_data(logs_path+'raw_values.txt')
     filtered = log_data(logs_path+'filtered_values.txt')

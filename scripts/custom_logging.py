@@ -22,8 +22,12 @@ def lookup_transform(tf_name, measurements, i):
         (translation, rotation) = listener.lookupTransform(
             'world', tf_name, rospy.Time(0))
         measurements[i, 0] = rospy.get_time()-t0
-        measurements[i, 1:4] = translation
-        measurements[i, 4:9] = rotation
+        if translation[0] == -123 and translation[1] == -123 and translation[2] == -123:
+            measurements[i, 1:4] = [None, None, None]
+            measurements[i, 4:9] = [None, None, None, None]
+        else:
+            measurements[i, 1:4] = translation
+            measurements[i, 4:9] = rotation
 
         i += 1
 

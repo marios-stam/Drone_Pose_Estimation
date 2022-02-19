@@ -2,13 +2,14 @@
 <launch>
 
   <!--launch Rviz-->
-  <node name="Rviz" pkg="rviz" type="rviz" args="-d $(find Drone_Pose_Estimation)/config/rviz_config.rviz"/>
+  <!-- <node name="Rviz" pkg="rviz" type="rviz" args="-d $(find Drone_Pose_Estimation)/config/rviz_config.rviz"/> -->
    
   <!--launch DronePoseEstimation-->
   <node name="DronePoseEstimation" pkg="drone_pose_estimation" type="drone_pose_estimation" />
-  <node name="logger" pkg="Drone_Pose_Estimation" type="custom_logging.py" />
+  <node name="logger" pkg="Drone_Pose_Estimation" type="custom_logging.py" required="true"/>
   <node name="kalamn_filter" pkg="Drone_Pose_Estimation" type="kalman_estimation.py" output="screen"  />
-  <node name="raw_data" pkg="Drone_Pose_Estimation" type="get_raw.py" />
+
+  <node name="raw_data" pkg="Drone_Pose_Estimation" type="get_raw.py"  />
 
   
 </launch>

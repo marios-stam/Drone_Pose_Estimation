@@ -4,6 +4,9 @@ from filterpy.common import Q_discrete_white_noise
 from filterpy.kalman import KalmanFilter
 import sys
 import os
+
+from stl import Mesh
+
 import tf
 from math import pi
 from visualization_msgs.msg import Marker
@@ -11,6 +14,14 @@ from tf import transformations
 import rospy
 import math
 import numpy as np
+
+
+# ============ INITIAL PARAMETERS ============
+PROCESS_NOISE = 1
+MEASUREMENT_NOISE = 0.1
+noises = np.array([PROCESS_NOISE, MEASUREMENT_NOISE])
+np.savetxt(
+    "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/noises.txt", noises)
 
 
 def get_measurement():
@@ -106,7 +117,7 @@ def init_kalman_1D(dt):
     f.P *= 1
 
     #  measurement noise
-    f.R *= 0.1
+    f.R *= MEASUREMENT_NOISE
 
     # process noise
     f.Q = Q_discrete_white_noise(dim=2, dt=dt, var=0.1)
@@ -134,9 +145,7 @@ def init_kalman_3D(dt):
     f.P *= 1
 
     #  measurement noise
-    f.R = np.eye(3) * 0.1
-
-    print("f.R.shape", f.R.shape)
+    f.R = np.eye(3) * MEASUREMENT_NOISE
 
     # process noise
     # making Q from 2x2(for each dimension) to 6x6 matrix
@@ -159,6 +168,7 @@ def init_kalman_3D(dt):
         [0, dt**3/2, 0, 0, dt**2, 0],
         [0, 0, dt**3/2, 0, 0, dt**2]
     ])
+    f.Q *= PROCESS_NOISE
 
     return f
 
@@ -191,9 +201,7 @@ def init_kalman_3D_accel(dt):
     f.P *= 1
 
     #  measurement noise
-    f.R = np.eye(3) * 1
-
-    print("f.R.shape", f.R.shape)
+    f.R = np.eye(3) * MEASUREMENT_NOISE
 
     # process noise
     # making Q from 2x2(for each dimension) to 6x6 matrix
@@ -219,6 +227,7 @@ def init_kalman_3D_accel(dt):
         [0, dt**2, 0, 0, dt, 0, 0, 1, 0],
         [0, 0, dt**2, 0, 0, dt, 0, 0, 1]
     ])
+    f.Q *= PROCESS_NOISE
 
     return f
 
@@ -252,9 +261,7 @@ def init_kalman_3D_jerk(dt):
     f.P *= 1
 
     #  measurement noise
-    f.R = np.eye(3) * 1
-
-    print("f.R.shape", f.R.shape)
+    f.R = np.eye(3) * MEASUREMENT_NOISE
 
     # process noise
     # making Q from 2x2(for each dimension) to 6x6 matrix
@@ -269,7 +276,7 @@ def init_kalman_3D_jerk(dt):
     Q[4, 2:4] = Qi[1, :]
     Q[5, 4:6] = Qi[1, :]
 
-    f.Q = np.eye(12) * 0.001
+    f.Q = np.eye(12) * PROCESS_NOISE
 
     return f
 
