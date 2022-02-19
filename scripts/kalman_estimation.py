@@ -17,8 +17,9 @@ import numpy as np
 
 
 # ============ INITIAL PARAMETERS ============
-PROCESS_NOISE = 1
-MEASUREMENT_NOISE = 0.1
+PROCESS_NOISE = 0.75
+MEASUREMENT_NOISE = 2
+
 noises = np.array([PROCESS_NOISE, MEASUREMENT_NOISE])
 np.savetxt(
     "/home/marios/catkin_ws/src/Drone_Pose_Estimation/logs/noises.txt", noises)

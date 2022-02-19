@@ -159,7 +159,6 @@ def pose_estimation(frame, matrix_coefficients, distortion_coefficients):
                 rpy[0], rpy[1], rpy[2]), (50, 120), font, fontScale, color, thickness, cv2.LINE_AA)
     else:
         pass
-        # print("mlkia")
     return frame
 
 
